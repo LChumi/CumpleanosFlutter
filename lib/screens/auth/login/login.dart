@@ -1,3 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:cumple_consultas/constants/constants.dart';
+import 'package:cumple_consultas/constants/routes.dart';
+import 'package:cumple_consultas/firebase/firebase_auth_helper/firebase_auth_helpe.dart';
+import 'package:cumple_consultas/screens/auth/registro/registro.dart';
+import 'package:cumple_consultas/screens/home/home.dart';
 import 'package:cumple_consultas/widgets/boton_primario/boton_primario.dart';
 import 'package:cumple_consultas/widgets/titulos_mejores/top_titulos.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,13 +72,22 @@ class _LoginState extends State<Login> {
             BotonPrimario(
               titulo: "Iniciar Sesión",
               onPressed: () async {
-                
+                bool camposValidos =
+                    loginValidation(correo.text, password.text);
+                if (camposValidos) {
+                  bool haIniciadoSesion = await FirebaseAuthHelper.instance
+                      .login(correo.text, password.text, context);
+                  if (haIniciadoSesion) {
+                    Routes.instance.pushAndRemoveUntil(
+                        widget: const Home(), context: context);
+                  }
+                }
               },
             ),
             const SizedBox(
               height: 12.0,
             ),
-            const Center(child: Text("No tienes cuenta")),
+            const Center(child: Text("¿No tienes cuenta?")),
             const SizedBox(
               height: 12.0,
             ),
@@ -81,7 +97,10 @@ class _LoginState extends State<Login> {
                       "Crear una Cuenta",
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
-                    onPressed: () {}))
+                    onPressed: () {
+                      Routes.instance
+                          .push(widget: const Registro(), context: context);
+                    }))
           ],
         ),
       ),
